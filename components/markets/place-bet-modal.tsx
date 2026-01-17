@@ -66,10 +66,14 @@ export function PlaceBetModal({
           title: "Success!",
           description: "Bet placed",
         });
-        onOpenChange(false);
         setAmount(""); // Reset form
         setPosition(true);
-        router.refresh();
+        onOpenChange(false);
+        
+        // Small delay to ensure trigger has completed
+        setTimeout(() => {
+          router.refresh();
+        }, 300);
       }
     } catch (error) {
       toast({

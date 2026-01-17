@@ -31,6 +31,7 @@ export default function BetDetailPage({
   const [profile, setProfile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showBetModal, setShowBetModal] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0); // Add refresh key
 
   useEffect(() => {
     loadData();
@@ -47,7 +48,8 @@ export default function BetDetailPage({
           table: "bets",
           filter: `market_id=eq.${marketId}`,
         },
-        () => {
+        (payload) => {
+          console.log("[Realtime] Bets changed:", payload);
           loadData();
         }
       )
@@ -59,16 +61,19 @@ export default function BetDetailPage({
           table: "markets",
           filter: `id=eq.${marketId}`,
         },
-        () => {
+        (payload) => {
+          console.log("[Realtime] Market changed:", payload);
           loadData();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log("[Realtime] Subscription status:", status);
+      });
 
     return () => {
       channel.unsubscribe();
     };
-  }, [marketId]);
+  }, [marketId, refreshKey]);
 
   async function loadData() {
     const supabase = createClient();
@@ -328,7 +333,9 @@ export default function BetDetailPage({
         onOpenChange={(open) => {
           setShowBetModal(open);
           if (!open) {
-            // Reload data when modal closes to ensure fresh odds
+            // Force reload data when modal closes
+            console.log("[Modal] Closed - reloading data");
+            setRefreshKey(prev => prev + 1);
             loadData();
           }
         }}
