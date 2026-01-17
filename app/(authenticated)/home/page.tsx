@@ -41,6 +41,7 @@ async function GroupsList() {
       groups (
         id,
         name,
+        image_url,
         invite_code,
         created_by,
         created_at
@@ -94,6 +95,7 @@ async function GroupsList() {
           key={group.id}
           id={group.id}
           name={group.name}
+          imageUrl={group.image_url}
           memberCount={group.memberCount}
           balance={group.balance}
           activeBetsCount={group.activeBetsCount}

@@ -12,6 +12,7 @@ import { connection } from "next/server";
 import { cn } from "@/lib/utils";
 import { formatCoins } from "@/lib/utils/calculations";
 import { ResolvedBetsList } from "@/components/groups/resolved-bets-list";
+import { SettlementInfo } from "@/components/groups/settlement-info";
 
 async function GroupContent({ groupId, userId }: { groupId: string; userId: string }) {
   await connection();
@@ -50,17 +51,19 @@ async function GroupContent({ groupId, userId }: { groupId: string; userId: stri
         id,
         username,
         display_name,
-        avatar_url
+        avatar_url,
+        venmo_username
       )
     `)
     .eq("group_id", groupId)
-    .order("balance", { ascending: false });
+    .order("balance", { ascending: false});
 
   const formattedMembers = members?.map((m: any) => ({
     id: m.users.id,
     username: m.users.username,
     display_name: m.users.display_name,
     avatar_url: m.users.avatar_url,
+    venmo_username: m.users.venmo_username,
     balance: m.balance,
     is_creator: m.users.id === group.created_by,
   })) || [];
@@ -173,6 +176,9 @@ async function GroupContent({ groupId, userId }: { groupId: string; userId: stri
       {/* Resolved Bets */}
       <ResolvedBetsList groupId={groupId} resolvedBets={resolvedBets || []} />
 
+      {/* Settlement Info */}
+      <SettlementInfo members={formattedMembers} groupName={group.name} />
+
       {/* Members Section */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
@@ -212,10 +218,10 @@ async function GroupHeader({ groupId, userId }: { groupId: string; userId: strin
     .eq("id", userId)
     .single();
 
-  // Get group name for header
+  // Get group name and image for header
   const { data: group } = await supabase
     .from("groups")
-    .select("name")
+    .select("name, image_url")
     .eq("id", groupId)
     .single();
 
@@ -224,7 +230,16 @@ async function GroupHeader({ groupId, userId }: { groupId: string; userId: strin
       <Header user={profile} />
       {group && (
         <div className="bg-card border-b border-border p-4">
-          <h1 className="text-xl font-bold text-foreground">{group.name}</h1>
+          <div className="flex items-center gap-3">
+            {group.image_url && (
+              <img
+                src={group.image_url}
+                alt={group.name}
+                className="w-12 h-12 rounded-lg object-cover"
+              />
+            )}
+            <h1 className="text-xl font-bold text-foreground">{group.name}</h1>
+          </div>
         </div>
       )}
     </>

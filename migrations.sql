@@ -48,6 +48,10 @@ ALTER TABLE public.markets
 ALTER TABLE public.markets 
   ADD COLUMN IF NOT EXISTS resolution_note text;
 
+-- Add image URL column to groups table
+ALTER TABLE public.groups
+  ADD COLUMN IF NOT EXISTS image_url text;
+
 -- Update existing markets to have nullable times
 UPDATE public.markets 
 SET lock_time = NULL, end_time = NULL 

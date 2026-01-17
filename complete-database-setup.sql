@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS public.groups (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text NOT NULL,
   invite_code text UNIQUE NOT NULL,
+  image_url text,
   created_by uuid REFERENCES public.users(id) NOT NULL,
   created_at timestamptz DEFAULT NOW(),
   

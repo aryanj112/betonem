@@ -11,12 +11,14 @@ import { formatCoins } from "@/lib/utils/calculations";
 import { formatDateTime } from "@/lib/utils/formatting";
 import { TrendingUp, TrendingDown, Trophy, Award, Target } from "lucide-react";
 import Link from "next/link";
+import { SettlementInfo } from "@/components/groups/settlement-info";
 
 export default function EarningsPage() {
   const router = useRouter();
   const [profile, setProfile] = useState<any>(null);
   const [stats, setStats] = useState<any>(null);
   const [recentBets, setRecentBets] = useState<any[]>([]);
+  const [groupsData, setGroupsData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -44,14 +46,57 @@ export default function EarningsPage() {
 
     setProfile(userProfile);
 
-    // Get all groups user is in
+    // Get all groups user is in with member details
     const { data: memberships } = await supabase
       .from("group_members")
-      .select("group_id, balance")
+      .select(`
+        group_id, 
+        balance,
+        groups (
+          id,
+          name
+        )
+      `)
       .eq("user_id", user.id);
 
     const groupIds = memberships?.map((m) => m.group_id) || [];
     const totalBalance = memberships?.reduce((sum, m) => sum + m.balance, 0) || 0;
+
+    // For each group, get all members for settlement info
+    const groupsWithMembers = await Promise.all(
+      (memberships || []).map(async (membership: any) => {
+        const { data: members } = await supabase
+          .from("group_members")
+          .select(`
+            balance,
+            users (
+              id,
+              username,
+              display_name,
+              avatar_url,
+              venmo_username
+            )
+          `)
+          .eq("group_id", membership.group_id)
+          .order("balance", { ascending: false });
+
+        return {
+          groupId: membership.group_id,
+          groupName: membership.groups.name,
+          userBalance: membership.balance,
+          members: members?.map((m: any) => ({
+            id: m.users.id,
+            username: m.users.username,
+            display_name: m.users.display_name,
+            avatar_url: m.users.avatar_url,
+            venmo_username: m.users.venmo_username,
+            balance: m.balance,
+          })) || [],
+        };
+      })
+    );
+
+    setGroupsData(groupsWithMembers);
 
     // Get all resolved bets
     const { data: resolvedBetsData } = await supabase
@@ -177,7 +222,7 @@ export default function EarningsPage() {
               <CardDescription>Total Profit/Loss</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className={`text-3xl font-bold ${(stats?.totalProfit || 0) >= 0 ? "text-green-600" : "text-red-600"}`}>
+              <p className={`text-3xl font-bold ${(stats?.totalProfit || 0) >= 0 ? "text-green-400" : "text-red-400"}`}>
                 {(stats?.totalProfit || 0) >= 0 ? "+" : ""}
                 {formatCoins(stats?.totalProfit || 0)}
               </p>
@@ -187,6 +232,23 @@ export default function EarningsPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Settlement Info by Group */}
+        {groupsData.length > 0 && (
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold text-foreground">Settlement Info</h2>
+            <p className="text-sm text-muted-foreground">
+              See who you need to pay or who owes you in each group
+            </p>
+            {groupsData.map((group) => (
+              <SettlementInfo
+                key={group.groupId}
+                members={group.members}
+                groupName={group.groupName}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Recent Bets */}
         <Card>
@@ -227,12 +289,12 @@ export default function EarningsPage() {
                     </div>
                     <div className="text-right">
                       {bet.won ? (
-                        <div className="flex items-center gap-1 text-green-600">
+                        <div className="flex items-center gap-1 text-green-400">
                           <TrendingUp className="w-4 h-4" />
                           <span className="font-bold">+{formatCoins(bet.profit)}</span>
                         </div>
                       ) : (
-                        <div className="flex items-center gap-1 text-red-600">
+                        <div className="flex items-center gap-1 text-red-400">
                           <TrendingDown className="w-4 h-4" />
                           <span className="font-bold">{formatCoins(bet.profit)}</span>
                         </div>
