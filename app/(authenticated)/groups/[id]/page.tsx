@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import { unstable_noStore } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { Header } from "@/components/layout/header";
 import { MemberList } from "@/components/groups/member-list";
@@ -12,9 +13,9 @@ import { connection } from "next/server";
 import { cn } from "@/lib/utils";
 import { formatCoins } from "@/lib/utils/calculations";
 import { ResolvedBetsList } from "@/components/groups/resolved-bets-list";
-import { SettlementInfo } from "@/components/groups/settlement-info";
 
 async function GroupContent({ groupId, userId }: { groupId: string; userId: string }) {
+  unstable_noStore();
   await connection();
   
   const supabase = await createClient();
@@ -51,19 +52,17 @@ async function GroupContent({ groupId, userId }: { groupId: string; userId: stri
         id,
         username,
         display_name,
-        avatar_url,
-        venmo_username
+        avatar_url
       )
     `)
     .eq("group_id", groupId)
-    .order("balance", { ascending: false});
+    .order("balance", { ascending: false });
 
   const formattedMembers = members?.map((m: any) => ({
     id: m.users.id,
     username: m.users.username,
     display_name: m.users.display_name,
     avatar_url: m.users.avatar_url,
-    venmo_username: m.users.venmo_username,
     balance: m.balance,
     is_creator: m.users.id === group.created_by,
   })) || [];
@@ -176,9 +175,6 @@ async function GroupContent({ groupId, userId }: { groupId: string; userId: stri
       {/* Resolved Bets */}
       <ResolvedBetsList groupId={groupId} resolvedBets={resolvedBets || []} />
 
-      {/* Settlement Info */}
-      <SettlementInfo members={formattedMembers} groupName={group.name} />
-
       {/* Members Section */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
@@ -208,6 +204,7 @@ async function GroupContent({ groupId, userId }: { groupId: string; userId: stri
 }
 
 async function GroupHeader({ groupId, userId }: { groupId: string; userId: string }) {
+  unstable_noStore();
   await connection();
   
   const supabase = await createClient();
@@ -218,10 +215,10 @@ async function GroupHeader({ groupId, userId }: { groupId: string; userId: strin
     .eq("id", userId)
     .single();
 
-  // Get group name and image for header
+  // Get group name for header
   const { data: group } = await supabase
     .from("groups")
-    .select("name, image_url")
+    .select("name")
     .eq("id", groupId)
     .single();
 
@@ -230,23 +227,15 @@ async function GroupHeader({ groupId, userId }: { groupId: string; userId: strin
       <Header user={profile} />
       {group && (
         <div className="bg-card border-b border-border p-4">
-          <div className="flex items-center gap-3">
-            {group.image_url && (
-              <img
-                src={group.image_url}
-                alt={group.name}
-                className="w-12 h-12 rounded-lg object-cover"
-              />
-            )}
-            <h1 className="text-xl font-bold text-foreground">{group.name}</h1>
-          </div>
+          <h1 className="text-xl font-bold text-foreground">{group.name}</h1>
         </div>
       )}
     </>
   );
 }
 
-async function PageContent({ groupId }: { groupId: string }) {
+async function UserAuth({ groupId }: { groupId: string }) {
+  unstable_noStore();
   await connection();
   
   const supabase = await createClient();
@@ -281,7 +270,7 @@ export default async function GroupDetailPage({
   return (
     <div className="min-h-screen">
       <Suspense fallback={<LoadingSpinner />}>
-        <PageContent groupId={id} />
+        <UserAuth groupId={id} />
       </Suspense>
     </div>
   );
