@@ -1,13 +1,20 @@
 import { Suspense } from "react";
+import dynamic from "next/dynamic";
+import { unstable_noStore } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { BottomNav } from "@/components/layout/bottom-nav";
 import { Toaster } from "@/components/ui/toaster";
 import { LoadingSpinner } from "@/components/common/loading-spinner";
 import { connection } from "next/server";
 
+const BottomNav = dynamic(
+  () => import("@/components/layout/bottom-nav").then((mod) => mod.BottomNav),
+  { ssr: false }
+);
+
 async function AuthCheck() {
   // Tell Next.js this component needs dynamic data
+  unstable_noStore();
   await connection();
   
   const supabase = await createClient();
@@ -45,7 +52,9 @@ export default function AuthenticatedLayout({
         <AuthCheck />
       </Suspense>
       <main className="flex-1 pb-16">{children}</main>
-      <BottomNav />
+      <Suspense fallback={null}>
+        <BottomNav />
+      </Suspense>
       <Toaster />
     </div>
   );
