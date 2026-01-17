@@ -8,7 +8,7 @@ import { LoadingSpinner } from "@/components/common/loading-spinner";
 import { connection } from "next/server";
 
 const BottomNav = dynamic(
-  () => import("@/components/layout/bottom-nav").then((mod) => mod.BottomNav),
+  () => import("@/components/layout/bottom-nav").then((mod) => ({ default: mod.BottomNav })),
   { ssr: false }
 );
 
@@ -40,6 +40,9 @@ async function AuthCheck() {
 
   return null;
 }
+
+// Mark this layout as dynamic to prevent prerendering issues
+export const dynamic = 'force-dynamic';
 
 export default function AuthenticatedLayout({
   children,

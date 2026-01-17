@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, TrendingUp, User } from "lucide-react";
@@ -23,14 +24,14 @@ const navItems = [
   },
 ];
 
-export function BottomNav() {
+function BottomNavContent() {
   const pathname = usePathname();
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-900 pb-safe z-50">
       <div className="flex items-center justify-around h-16">
         {navItems.map((item) => {
-          const isActive = pathname.startsWith(item.href);
+          const isActive = pathname?.startsWith(item.href) ?? false;
           const Icon = item.icon;
 
           return (
@@ -55,3 +56,16 @@ export function BottomNav() {
   );
 }
 
+export function BottomNav() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
+
+  return <BottomNavContent />;
+}
