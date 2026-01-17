@@ -1,109 +1,217 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+# BetOnEm 🎯
 
-<p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
+A mobile-first web app where friends create private groups and bet on real-life events with play money.
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
-<br/>
+## Quick Start
+
+### 1. Install Dependencies
+```bash
+npm install
+```
+
+### 2. Set Up Supabase
+
+#### Create Project
+1. Go to [supabase.com](https://supabase.com) and create a new project
+2. Wait for the project to be ready (~2 minutes)
+
+#### Run Database Setup
+1. Go to **SQL Editor** in your Supabase dashboard
+2. Click **New Query**
+3. Copy the entire contents of `complete-database-setup.sql`
+4. Paste and run it (this creates everything you need)
+
+#### Get Your Credentials
+1. Go to **Project Settings** → **API**
+2. Copy your **Project URL** and **anon key**
+
+### 3. Configure Environment Variables
+
+Create `.env.local` in the project root:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+### 4. Run the App
+```bash
+npm run dev
+```
+
+Visit [http://localhost:3000](http://localhost:3000)
 
 ## Features
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Proxy
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Password-based authentication block installed via the [Supabase UI Library](https://supabase.com/ui/docs/nextjs/password-based-auth)
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Components with [shadcn/ui](https://ui.shadcn.com/)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+✅ **Email Verification** - Secure signup with email confirmation  
+✅ **Authentication** - Email/password login  
+✅ **Private Groups** - Create groups with friends using invite codes  
+✅ **Prediction Markets** - Create bets on real-life events  
+✅ **Parimutuel Betting** - Dynamic odds based on pool distribution  
+✅ **Real-time Updates** - Live odds updates via Supabase Realtime  
+✅ **Play Money** - Start with 1000 coins per group  
+✅ **Mobile-First** - Optimized for mobile devices  
 
-## Demo
+## Tech Stack
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+- **Frontend**: Next.js 14 (App Router) + React 19
+- **Database**: Supabase (PostgreSQL)
+- **Auth**: Supabase Auth (Email/Password)
+- **Realtime**: Supabase Realtime
+- **Styling**: Tailwind CSS + shadcn/ui
+- **State**: Zustand
+- **Deployment**: Vercel
 
-## Deploy to Vercel
+## Project Structure
 
-Vercel deployment will guide you through creating a Supabase account and project.
+```
+app/
+  (authenticated)/          # Protected routes
+    home/                   # Groups list
+    groups/[id]/           # Group detail & bets
+    earnings/              # Bet history & stats
+    profile/               # User profile
+  signup/                  # Sign up page
+  login/                   # Login page
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+components/
+  auth/                    # Auth components
+  groups/                  # Group management
+  markets/                 # Betting components
+  layout/                  # Navigation & layout
+  ui/                      # shadcn/ui components
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This+starter+configures+Supabase+Auth+to+use+cookies%2C+making+the+user%27s+session+available+throughout+the+entire+Next.js+app+-+Client+Components%2C+Server+Components%2C+Route+Handlers%2C+Server+Actions+and+Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png)
+lib/
+  actions/                 # Server actions
+  supabase/                # Supabase clients
+  stores/                  # Zustand stores
+  utils/                   # Utilities & calculations
+```
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+## How It Works
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+### 1. Create or Join a Group
+- Create a group and get a 6-character invite code
+- Share the code with friends
+- Everyone starts with 1000 coins
 
-## Clone and run locally
+### 2. Create a Bet
+- Ask a yes/no question (e.g., "Will it rain tomorrow?")
+- Set a betting deadline and resolution date
+- Friends can bet YES or NO
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+### 3. Place Bets
+- Choose YES or NO
+- Enter your bet amount
+- Odds update in real-time based on the pool
 
-2. Create a Next.js app using the Supabase Starter template npx command
+### 4. Resolution
+- After the betting deadline, the creator resolves the bet
+- Winners split the entire pool proportionally
+- Balances update automatically
+
+## Parimutuel Betting Math
+
+The app uses parimutuel betting (like horse racing):
+
+```
+Total Pool = YES pool + NO pool
+Your Payout = (Your Bet / Winning Pool) × Total Pool
+Your Profit = Payout - Your Bet
+```
+
+Example:
+- You bet 100 on YES
+- YES pool: 300, NO pool: 200 (total: 500)
+- YES wins → You get: (100/300) × 500 = 167 coins
+- Your profit: 67 coins
+
+## Deployment
+
+### Deploy to Vercel
+1. Push your code to GitHub
+2. Import to Vercel
+3. Add environment variables in Vercel dashboard
+4. Update `NEXT_PUBLIC_APP_URL` to your production domain
+
+### Update Supabase
+1. Go to **Authentication** → **URL Configuration**
+2. Set **Site URL** to your production domain
+3. Add domain to **Redirect URLs**
+
+## Troubleshooting
+
+### Issue: RLS errors (infinite recursion, policy violations, etc.)
+**This is the most common issue!** If your database already has tables but RLS is broken:
+1. Go to **SQL Editor** in your Supabase dashboard
+2. Copy the entire contents of `fix-all-rls-policies.sql`
+3. Paste and run it
+4. This will recreate all RLS policies with simpler, less restrictive rules
+
+**If you're starting fresh**, use `complete-database-setup.sql` instead (see Setup section above).
+
+### Issue: Can't create groups
+If groups won't create or you get invite code errors:
+1. Make sure you've run `fix-all-rls-policies.sql` (see above)
+2. Check browser console (F12) for detailed error messages
+3. The error logs will show exactly what's failing
+
+### Issue: Can't sign up
+1. Make sure you ran the database setup SQL file
+2. Check your email for the verification link (including spam folder)
+3. The verification link expires in 24 hours
+
+### Issue: Email not arriving
+1. Check your spam/junk folder
+2. Make sure you entered the correct email address
+3. Click "Resend Verification Email" on the verification screen
+4. Check Supabase Auth settings: **Authentication** → **Email Templates**
+
+### Issue: Environment variables not working
+1. Make sure `.env.local` is in the project root
+2. Variable names must be exact: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+3. Restart the dev server after creating/editing `.env.local`
+
+### Debugging Tips
+- Check the browser console (F12) for detailed error messages
+- Check the terminal where `npm run dev` is running for server-side errors
+- Use the Supabase dashboard **Logs** section to see database query errors
+- Server actions now have detailed logging - look for `[createGroup]`, `[createMarket]`, etc. in console
+
+## Development
 
    ```bash
-   npx create-next-app --example with-supabase with-supabase-app
-   ```
+# Install dependencies
+npm install
 
-   ```bash
-   yarn create next-app --example with-supabase with-supabase-app
-   ```
-
-   ```bash
-   pnpm create next-app --example with-supabase with-supabase-app
-   ```
-
-3. Use `cd` to change into the app's directory
-
-   ```bash
-   cd with-supabase-app
-   ```
-
-4. Rename `.env.example` to `.env.local` and update the following:
-
-  ```env
-  NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=[INSERT SUPABASE PROJECT API PUBLISHABLE OR ANON KEY]
-  ```
-  > [!NOTE]
-  > This example uses `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, which refers to Supabase's new **publishable** key format.
-  > Both legacy **anon** keys and new **publishable** keys can be used with this variable name during the transition period. Supabase's dashboard may show `NEXT_PUBLIC_SUPABASE_ANON_KEY`; its value can be used in this example.
-  > See the [full announcement](https://github.com/orgs/supabase/discussions/29260) for more information.
-
-  Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` can be found in [your Supabase project's API settings](https://supabase.com/dashboard/project/_?showConnect=true)
-
-5. You can now run the Next.js local development server:
-
-   ```bash
+# Run development server
    npm run dev
-   ```
 
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
+# Build for production
+npm run build
 
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
+# Start production server
+npm start
 
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+# Run linter
+npm run lint
+```
 
-## Feedback and issues
+## Future Enhancements
 
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
+- [ ] Evidence submission (photos/videos)
+- [ ] Evidence voting for decentralized resolution
+- [ ] Push notifications
+- [ ] Dark mode
+- [ ] PWA installation
+- [ ] Advanced analytics
+- [ ] Leaderboards
 
-## More Supabase examples
+## License
 
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+MIT
+
+## Support
+
+For issues or questions, create an issue on GitHub.
