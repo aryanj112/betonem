@@ -11,6 +11,7 @@ import { Settings, Users, Coins, TrendingUp } from "lucide-react";
 import { connection } from "next/server";
 import { cn } from "@/lib/utils";
 import { formatCoins } from "@/lib/utils/calculations";
+import { ResolvedBetsList } from "@/components/groups/resolved-bets-list";
 
 async function GroupContent({ groupId, userId }: { groupId: string; userId: string }) {
   await connection();
@@ -72,12 +73,14 @@ async function GroupContent({ groupId, userId }: { groupId: string; userId: stri
     .eq("status", "open")
     .order("created_at", { ascending: false });
 
-  // Get resolved bets count
-  const { count: resolvedCount } = await supabase
+  // Get resolved bets
+  const { data: resolvedBets } = await supabase
     .from("markets")
-    .select("*", { count: "exact", head: true })
+    .select("*")
     .eq("group_id", groupId)
-    .eq("status", "resolved");
+    .in("status", ["resolved", "cancelled"])
+    .order("resolved_at", { ascending: false })
+    .limit(10);
 
   return (
     <div className="space-y-6 p-4">
@@ -168,16 +171,7 @@ async function GroupContent({ groupId, userId }: { groupId: string; userId: stri
       </div>
 
       {/* Resolved Bets */}
-      {resolvedCount && resolvedCount > 0 && (
-        <div className="space-y-3">
-          <h2 className="text-lg font-semibold text-foreground">
-            Resolved Bets ({resolvedCount})
-          </h2>
-          <Button variant="outline" className="w-full">
-            View History
-          </Button>
-        </div>
-      )}
+      <ResolvedBetsList groupId={groupId} resolvedBets={resolvedBets || []} />
 
       {/* Members Section */}
       <div className="space-y-3">
