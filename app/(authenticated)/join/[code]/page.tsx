@@ -66,9 +66,9 @@ async function JoinPageContent({ code }: { code: string }) {
 export default async function JoinWithCodePage({
   params,
 }: {
-  params: Promise<{ code: string }>;
+  params: { code: string };
 }) {
-  const { code } = await params;
+  const { code } = params;
 
   return (
     <div className="min-h-screen">

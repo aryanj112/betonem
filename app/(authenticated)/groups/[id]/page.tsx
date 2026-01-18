@@ -263,9 +263,12 @@ async function UserAuth({ groupId }: { groupId: string }) {
 export default async function GroupDetailPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }) {
-  const { id } = await params;
+  const { id } = params;
+
+
+
 
   return (
     <div className="min-h-screen">

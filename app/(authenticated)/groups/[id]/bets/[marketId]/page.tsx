@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { use, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Header } from "@/components/layout/header";
@@ -19,9 +19,9 @@ import Link from "next/link";
 export default function BetDetailPage({
   params,
 }: {
-  params: Promise<{ id: string; marketId: string }>;
+  params: { id: string; marketId: string };
 }) {
-  const { id: groupId, marketId } = use(params);
+  const { id: groupId, marketId } = params;
   const router = useRouter();
   const [market, setMarket] = useState<any>(null);
   const [userBets, setUserBets] = useState<any[]>([]);
@@ -166,7 +166,7 @@ export default function BetDetailPage({
 
   const marketStatus = market.status;
   const totalPool = market.yes_pool + market.no_pool;
-  
+
   // Calculate total user exposure and potential payout
   const userTotalBet = userBets.reduce((sum, bet) => sum + bet.amount, 0);
   const userYesBets = userBets.filter(bet => bet.position);
@@ -244,7 +244,7 @@ export default function BetDetailPage({
         {userBets.length > 0 ? (
           <div className="bg-card border border-primary rounded-lg p-6 space-y-4">
             <h2 className="font-semibold text-foreground">Your Bets ({userBets.length})</h2>
-            
+
             {/* Summary */}
             <div className="grid grid-cols-2 gap-4 pb-4 border-b border-border">
               <div>
@@ -264,17 +264,17 @@ export default function BetDetailPage({
               {userBets.map((bet: any, index: number) => {
                 const payout = calculatePayout(bet.amount, bet.position, market.yes_pool, market.no_pool);
                 const profit = payout - bet.amount;
-                
+
                 return (
-                  <div 
-                    key={bet.id} 
+                  <div
+                    key={bet.id}
                     className="bg-muted/50 rounded p-3 flex items-center justify-between"
                   >
                     <div className="flex items-center gap-3">
                       <span className={cn(
                         "font-bold text-sm px-2 py-1 rounded",
-                        bet.position 
-                          ? "bg-green-500/20 text-green-400" 
+                        bet.position
+                          ? "bg-green-500/20 text-green-400"
                           : "bg-red-500/20 text-red-400"
                       )}>
                         {bet.position ? "YES" : "NO"}

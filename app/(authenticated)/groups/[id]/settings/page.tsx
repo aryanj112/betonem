@@ -15,15 +15,14 @@ import { ArrowLeft, Upload, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 interface GroupSettingsPageProps {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }
 
 export default function GroupSettingsPage({ params }: GroupSettingsPageProps) {
-  const unwrappedParams = React.use(params);
-  const groupId = unwrappedParams.id;
+  const groupId = params.id;
   const router = useRouter();
   const { toast } = useToast();
-  
+
   const [profile, setProfile] = useState<any>(null);
   const [group, setGroup] = useState<any>(null);
   const [groupName, setGroupName] = useState("");
@@ -166,7 +165,7 @@ export default function GroupSettingsPage({ params }: GroupSettingsPageProps) {
         .getPublicUrl(filePath);
 
       setGroupImage(publicUrl);
-      
+
       toast({
         title: "Success",
         description: "Image uploaded successfully",
@@ -264,7 +263,7 @@ export default function GroupSettingsPage({ params }: GroupSettingsPageProps) {
             {/* Group Image */}
             <div className="space-y-2">
               <Label>Group Image</Label>
-              
+
               {groupImage ? (
                 <div className="flex items-center gap-4">
                   <img
@@ -301,14 +300,14 @@ export default function GroupSettingsPage({ params }: GroupSettingsPageProps) {
                   </div>
                 </div>
               )}
-              
+
               {isUploading && (
                 <p className="text-sm text-primary">Uploading...</p>
               )}
             </div>
 
-            <Button 
-              onClick={handleSave} 
+            <Button
+              onClick={handleSave}
               disabled={isSaving || !groupName.trim()}
               className="w-full"
             >
@@ -374,4 +373,3 @@ export default function GroupSettingsPage({ params }: GroupSettingsPageProps) {
     </div>
   );
 }
-

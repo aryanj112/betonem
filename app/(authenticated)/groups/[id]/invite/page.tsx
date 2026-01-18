@@ -97,9 +97,9 @@ async function InvitePageContent({ groupId }: { groupId: string }) {
 export default async function InvitePage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }) {
-  const { id } = await params;
+  const { id } = params;
 
   return (
     <div className="min-h-screen">
@@ -109,4 +109,3 @@ export default async function InvitePage({
     </div>
   );
 }
-

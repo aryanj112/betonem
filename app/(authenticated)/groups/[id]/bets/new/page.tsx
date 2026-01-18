@@ -12,17 +12,16 @@ import { createMarket } from "@/lib/actions/markets";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { use } from "react";
 
 export default function CreateBetPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }) {
-  const { id: groupId } = use(params);
+  const { id: groupId } = params;
   const router = useRouter();
   const { toast } = useToast();
-  
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -118,7 +117,7 @@ export default function CreateBetPage({
               {/* Info Box */}
               <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
                 <p className="text-sm text-foreground">
-                  <strong>How it works:</strong> Friends can bet YES or NO anytime. 
+                  <strong>How it works:</strong> Friends can bet YES or NO anytime.
                   Odds update based on the pool. You resolve it when ready.
                 </p>
               </div>
