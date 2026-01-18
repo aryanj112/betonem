@@ -11,15 +11,22 @@ import { createClient } from "@/lib/supabase/client";
 import { SignupHeader } from "@/components/SignupHeader";
 import { SignupForm } from "@/components/SignupForm";
 import { ProfileSetupForm } from "@/components/auth/profile-setup-form";
+import { PhoneInputComponent } from "@/components/auth/phone-input";
+import { OTPInput } from "@/components/auth/otp-input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/common/loading-spinner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import styles from "@/styles/Signup.module.css";
 
 export default function SignupPage() {
   const router = useRouter();
-  const [step, setStep] = useState<"loading" | "signup" | "verify" | "profile">("loading");
+  const [step, setStep] = useState<"loading" | "signup" | "verify" | "verify-phone" | "profile">("loading");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [userId, setUserId] = useState("");
+  const [otp, setOtp] = useState("");
+  const [isVerifyingPhone, setIsVerifyingPhone] = useState(false);
 
   useEffect(() => {
     checkAuthStatus();
@@ -44,6 +51,7 @@ export default function SignupPage() {
         // Has auth but no profile, show profile setup
         setUserId(user.id);
         setEmail(user.email || "");
+        setPhone(user.phone || "");
         setStep("profile");
       }
     } else {
@@ -52,7 +60,7 @@ export default function SignupPage() {
     }
   };
 
-  const handleSignup = async (data: { email: string; password: string; confirmPassword: string }) => {
+  const handleEmailSignup = async (data: { email: string; password: string; confirmPassword: string }) => {
     try {
       const supabase = createClient();
       
@@ -81,6 +89,50 @@ export default function SignupPage() {
       }
     } catch (err: any) {
       throw err;
+    }
+  };
+
+  const handlePhoneSignup = async (phoneNumber: string) => {
+    try {
+      const supabase = createClient();
+      
+      const { error } = await supabase.auth.signInWithOtp({
+        phone: phoneNumber,
+        options: {
+          channel: "sms",
+        },
+      });
+
+      if (error) throw error;
+
+      setPhone(phoneNumber);
+      setStep("verify-phone");
+    } catch (err: any) {
+      throw err;
+    }
+  };
+
+  const handlePhoneOTPVerification = async (otpCode: string) => {
+    try {
+      setIsVerifyingPhone(true);
+      const supabase = createClient();
+      
+      const { data, error } = await supabase.auth.verifyOtp({
+        phone: phone,
+        token: otpCode,
+        type: "sms",
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        setUserId(data.user.id);
+        setStep("profile");
+      }
+    } catch (err: any) {
+      throw err;
+    } finally {
+      setIsVerifyingPhone(false);
     }
   };
 
@@ -121,11 +173,56 @@ export default function SignupPage() {
     );
   }
 
+  if (step === "verify-phone") {
+    return (
+      <main className={styles.page}>
+        <div className={styles.content}>
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle>Verify Your Phone</CardTitle>
+              <CardDescription>
+                We've sent a verification code to <strong>{phone}</strong>
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-4">
+                <OTPInput
+                  value={otp}
+                  onChange={setOtp}
+                  length={6}
+                  onComplete={handlePhoneOTPVerification}
+                  disabled={isVerifyingPhone}
+                />
+                <Button
+                  onClick={() => handlePhoneOTPVerification(otp)}
+                  disabled={otp.length !== 6 || isVerifyingPhone}
+                  className="w-full"
+                >
+                  {isVerifyingPhone ? "Verifying..." : "Verify Code"}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setOtp("");
+                    setStep("signup");
+                  }}
+                  className="w-full"
+                >
+                  Change Phone Number
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+    );
+  }
+
   if (step === "profile") {
     return (
       <main className={styles.page}>
         <div className={styles.content} style={{ maxWidth: "600px" }}>
-          <ProfileSetupForm userId={userId} email={email} />
+          <ProfileSetupForm userId={userId} email={email || undefined} phone={phone || undefined} />
         </div>
       </main>
     );
@@ -135,8 +232,72 @@ export default function SignupPage() {
     <main className={styles.page}>
       <div className={styles.content}>
         <SignupHeader />
-        <SignupForm onSubmit={handleSignup} />
+        <Tabs defaultValue="email" className="w-full max-w-md">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="email">Email</TabsTrigger>
+            <TabsTrigger value="phone">Phone</TabsTrigger>
+          </TabsList>
+          <TabsContent value="email">
+            <SignupForm onSubmit={handleEmailSignup} />
+          </TabsContent>
+          <TabsContent value="phone">
+            <PhoneSignupForm onSubmit={handlePhoneSignup} />
+          </TabsContent>
+        </Tabs>
       </div>
     </main>
+  );
+}
+
+function PhoneSignupForm({ onSubmit }: { onSubmit: (phone: string) => Promise<void> }) {
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!phoneNumber || phoneNumber.length < 10) {
+      setError("Please enter a valid phone number");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await onSubmit(phoneNumber);
+    } catch (err: any) {
+      console.error("Phone signup error:", err);
+      setError(err.message || "Failed to send verification code");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label htmlFor="phone" className="block text-sm font-medium mb-2">
+          Phone Number
+        </label>
+        <PhoneInputComponent
+          value={phoneNumber}
+          onChange={setPhoneNumber}
+          placeholder="+1 (555) 000-0000"
+        />
+      </div>
+
+      {error && (
+        <p className="text-sm text-red-500">{error}</p>
+      )}
+
+      <Button
+        type="submit"
+        className="w-full"
+        disabled={isLoading || !phoneNumber}
+      >
+        {isLoading ? "Sending Code..." : "Send Verification Code"}
+      </Button>
+    </form>
   );
 }

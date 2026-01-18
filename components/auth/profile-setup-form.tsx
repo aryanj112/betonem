@@ -13,10 +13,11 @@ import { Camera } from "lucide-react";
 
 interface ProfileSetupFormProps {
   userId: string;
-  email: string;
+  email?: string;
+  phone?: string;
 }
 
-export function ProfileSetupForm({ userId, email }: ProfileSetupFormProps) {
+export function ProfileSetupForm({ userId, email, phone }: ProfileSetupFormProps) {
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");

@@ -29,13 +29,16 @@ export async function createUserProfile(data: {
     return { error: "Username already taken" };
   }
 
-  // Get user email from auth
+  // Get user email or phone from auth
   const email = user.email || "";
+  const phone = user.phone || "";
+  // Use phone if available, otherwise fall back to email
+  const identifier = phone || email;
 
   // Create user profile with service role
   const { error: insertError } = await supabase.from("users").insert({
     id: user.id,
-    phone_number: email, // Using email for now
+    phone_number: identifier, // Phone or email
     username: data.username.toLowerCase(),
     display_name: data.displayName,
     venmo_username: data.venmoUsername || null,
