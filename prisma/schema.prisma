@@ -1,0 +1,96 @@
+// Prisma Schema for BetOnEm PayPal Backend
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id
+  email        String   @unique
+  venmoHandle  String?  @map("venmo_handle")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  participants BetParticipant[]
+  payouts      Payout[]
+
+  @@map("users")
+}
+
+model Bet {
+  id               String           @id @default(uuid())
+  title            String
+  stakeAmountCents Int              @map("stake_amount_cents")
+  status           BetStatus        @default(OPEN)
+  endsAt           DateTime         @map("ends_at")
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+
+  participants BetParticipant[]
+  payouts      Payout[]
+
+  @@map("bets")
+}
+
+model BetParticipant {
+  id          String                @id @default(uuid())
+  betId       String                @map("bet_id")
+  userId      String                @map("user_id")
+  orderId     String?               @unique @map("order_id")
+  captureId   String?               @unique @map("capture_id")
+  status      BetParticipantStatus  @default(CREATED)
+  createdAt   DateTime              @default(now()) @map("created_at")
+  updatedAt   DateTime              @updatedAt @map("updated_at")
+
+  bet  Bet   @relation(fields: [betId], references: [id], onDelete: Cascade)
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([betId, userId])
+  @@index([betId])
+  @@index([orderId])
+  @@map("bet_participants")
+}
+
+model Payout {
+  id            String        @id @default(uuid())
+  betId         String        @map("bet_id")
+  userId        String        @map("user_id")
+  amountCents   Int           @map("amount_cents")
+  batchId       String?       @map("batch_id")
+  itemId        String?       @unique @map("item_id")
+  status        PayoutStatus  @default(PENDING)
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  bet  Bet   @relation(fields: [betId], references: [id], onDelete: Cascade)
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([betId])
+  @@index([batchId])
+  @@map("payouts")
+}
+
+enum BetStatus {
+  OPEN
+  LOCKED
+  SETTLED
+}
+
+enum BetParticipantStatus {
+  CREATED
+  APPROVED
+  CAPTURED
+  FAILED
+}
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  SUCCESS
+  FAILED
+  DENIED
+}

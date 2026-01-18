@@ -1,0 +1,111 @@
+.card {
+  position: absolute;
+  /* width set inline for randomization */
+  padding: 16px;
+  background: rgba(10, 10, 30, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 100, 150, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 100, 150, 0.1);
+  pointer-events: none;
+  user-select: none;
+  animation: floatDown linear infinite;
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  z-index: 0;
+  /* opacity set inline for randomization */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    animation: none;
+  }
+}
+
+@keyframes floatDown {
+  from {
+    transform: translateY(-100vh) translateZ(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0;
+  }
+  18% {
+    /* opacity will be set inline, animation maintains it */
+    opacity: inherit;
+  }
+  85% {
+    opacity: inherit;
+  }
+  88% {
+    opacity: 0;
+  }
+  to {
+    transform: translateY(calc(200vh + 100px)) translateZ(0);
+    opacity: 0;
+  }
+}
+
+.statusPill {
+  display: inline-block;
+  padding: 4px 10px;
+  background: rgba(0, 255, 150, 0.2);
+  border: 1px solid rgba(0, 255, 150, 0.4);
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #00ff96;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.4;
+  margin-bottom: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.pool {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.poolLabel {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.poolAmount {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ff6c9f;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .card {
+    /* width set inline for randomization */
+    padding: 12px;
+  }
+  
+  .title {
+    font-size: 12px;
+  }
+  
+  .poolAmount {
+    font-size: 16px;
+  }
+}

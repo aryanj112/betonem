@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Lexend_Deca } from "next/font/google";
+import { Press_Start_2P } from "next/font/google";
 import { ThemeProvider } from "next-themes";
+import { PageTransition } from "@/components/PageTransition";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -13,10 +15,20 @@ export const metadata: Metadata = {
   description: "Create prediction markets with your friends. Make friendly bets on real-life events with play money.",
 };
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Primary body font
+const lexendDeca = Lexend_Deca({
+  variable: "--font-lexend-deca",
   display: "swap",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+});
+
+// Arcade font for hero headline
+const pressStart2P = Press_Start_2P({
+  variable: "--font-arcade",
+  display: "swap",
+  subsets: ["latin"],
+  weight: ["400"],
 });
 
 export default function RootLayout({
@@ -26,14 +38,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.className} antialiased`}>
+      <body className={`${lexendDeca.variable} ${pressStart2P.variable} antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <PageTransition>{children}</PageTransition>
         </ThemeProvider>
       </body>
     </html>
