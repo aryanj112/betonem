@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Header } from "@/components/layout/header";
@@ -19,9 +19,9 @@ import Link from "next/link";
 export default function BetDetailPage({
   params,
 }: {
-  params: { id: string; marketId: string };
+  params: Promise<{ id: string; marketId: string }>;
 }) {
-  const { id: groupId, marketId } = params;
+  const { id: groupId, marketId } = use(params);
   const router = useRouter();
   const [market, setMarket] = useState<any>(null);
   const [userBets, setUserBets] = useState<any[]>([]);

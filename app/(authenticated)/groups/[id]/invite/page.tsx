@@ -97,9 +97,9 @@ async function InvitePageContent({ groupId }: { groupId: string }) {
 export default async function InvitePage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const { id } = params;
+  const { id } = await params;
 
   return (
     <div className="min-h-screen">

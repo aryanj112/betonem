@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Header } from "@/components/layout/header";
@@ -15,11 +15,11 @@ import { ArrowLeft, Upload, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 interface GroupSettingsPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default function GroupSettingsPage({ params }: GroupSettingsPageProps) {
-  const groupId = params.id;
+  const groupId = use(params).id;
   const router = useRouter();
   const { toast } = useToast();
 
