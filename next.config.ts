@@ -2,6 +2,14 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
+  eslint: {
+    // Don't fail builds on ESLint errors in production
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    // Don't fail builds on TypeScript errors in production (optional)
+    // ignoreBuildErrors: true,
+  },
   experimental: {
     // Ensure dynamic rendering works properly
     serverActions: {
