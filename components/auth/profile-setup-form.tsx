@@ -114,13 +114,13 @@ export function ProfileSetupForm({ userId, email }: ProfileSetupFormProps) {
         throw new Error(result.error);
       }
 
-      // Success! Redirect to home
-      router.push("/home");
-      router.refresh();
+      console.log("Profile created successfully, redirecting to home...");
+      
+      // Success! Force a hard refresh to clear any cached auth state
+      window.location.href = "/home";
     } catch (err: any) {
       console.error("Profile setup error:", err);
       setError(err.message || "Failed to create profile");
-    } finally {
       setIsLoading(false);
     }
   };
@@ -136,7 +136,7 @@ export function ProfileSetupForm({ userId, email }: ProfileSetupFormProps) {
           {/* Avatar */}
           <div className="flex flex-col items-center gap-4">
             <div className="relative">
-              <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+              <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center overflow-hidden border border-border">
                 {avatarPreview ? (
                   <img
                     src={avatarPreview}
@@ -144,7 +144,7 @@ export function ProfileSetupForm({ userId, email }: ProfileSetupFormProps) {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <Camera className="w-8 h-8 text-gray-400" />
+                  <Camera className="w-8 h-8 text-muted-foreground" />
                 )}
               </div>
               <input
@@ -167,7 +167,7 @@ export function ProfileSetupForm({ userId, email }: ProfileSetupFormProps) {
           {/* Username */}
           <div className="space-y-2">
             <Label htmlFor="username">
-              Username <span className="text-red-500">*</span>
+              Username <span className="text-primary">*</span>
             </Label>
             <Input
               id="username"
@@ -183,7 +183,7 @@ export function ProfileSetupForm({ userId, email }: ProfileSetupFormProps) {
               maxLength={20}
             />
             {usernameError && (
-              <p className="text-sm text-red-500">{usernameError}</p>
+              <p className="text-sm text-primary">{usernameError}</p>
             )}
             <p className="text-sm text-muted-foreground">
               Lowercase, alphanumeric, underscores only
@@ -193,7 +193,7 @@ export function ProfileSetupForm({ userId, email }: ProfileSetupFormProps) {
           {/* Display Name */}
           <div className="space-y-2">
             <Label htmlFor="displayName">
-              Display Name <span className="text-red-500">*</span>
+              Display Name <span className="text-primary">*</span>
             </Label>
             <Input
               id="displayName"
@@ -231,7 +231,7 @@ export function ProfileSetupForm({ userId, email }: ProfileSetupFormProps) {
             </p>
           </div>
 
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && <p className="text-sm text-primary">{error}</p>}
 
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? "Creating Account..." : "Create Account"}

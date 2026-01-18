@@ -87,21 +87,21 @@ async function GroupContent({ groupId, userId }: { groupId: string; userId: stri
   return (
     <div className="space-y-6 p-4">
       {/* Balance Card */}
-      <div className="bg-gradient-to-br from-primary to-red-600 text-white rounded-lg p-6 shadow-lg">
+      <div className="bg-gradient-to-br from-[#ff6c9f] to-[#ff3d7a] text-white rounded-lg p-6 shadow-lg">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-red-100 text-sm mb-1">Your Balance</p>
+            <p className="text-pink-100 text-sm mb-1">Your Balance</p>
             <p className={cn(
               "text-4xl font-bold",
               membership.balance < 0 && "text-yellow-300"
             )}>
               {formatCoins(membership.balance)}
             </p>
-            <p className="text-red-100 text-sm mt-1">
+            <p className="text-pink-100 text-sm mt-1">
               {membership.balance < 0 ? "in debt" : ""}
             </p>
           </div>
-          <Coins className="w-16 h-16 text-red-300 opacity-50" />
+          <Coins className="w-16 h-16 text-pink-300 opacity-50" />
         </div>
       </div>
 
@@ -245,7 +245,7 @@ async function UserAuth({ groupId }: { groupId: string }) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login");
+    redirect("/signin");
   }
 
   return (

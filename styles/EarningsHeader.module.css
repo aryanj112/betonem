@@ -1,0 +1,40 @@
+/* Earnings Header Component */
+
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.title {
+  font-family: var(--font-arcade);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.titleAccent {
+  color: #ff6c9f;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 400;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .header {
+    margin-bottom: 2rem;
+  }
+  
+  .subtitle {
+    font-size: 0.9375rem;
+  }
+}
+

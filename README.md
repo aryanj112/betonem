@@ -274,3 +274,18 @@ MIT
 ## Support
 
 For issues or questions, create an issue on GitHub.
+
+## Documentation
+
+Additional documentation is available in the `/docs` folder:
+
+- **[AUTH_FLOW_VALIDATION.md](docs/AUTH_FLOW_VALIDATION.md)** - Complete authentication flow documentation
+- **[EMAIL_VERIFICATION_FIX.md](docs/EMAIL_VERIFICATION_FIX.md)** - Email verification setup and troubleshooting
+- **[PROFILE_REDIRECT_FIX.md](docs/PROFILE_REDIRECT_FIX.md)** - Profile creation flow fixes
+- **[EARNINGS_PAGE_README.md](docs/EARNINGS_PAGE_README.md)** - Earnings page documentation
+- **[LANDING_PAGE_README.md](docs/LANDING_PAGE_README.md)** - Landing page design guide
+- **[SERVER_README.md](docs/SERVER_README.md)** - PayPal server documentation
+- **[API_REFERENCE.md](docs/API_REFERENCE.md)** - Server API reference
+- **[DEPLOYMENT-FIXES.md](docs/DEPLOYMENT-FIXES.md)** - Common deployment issues and fixes
+- **[CHECKLIST.md](docs/CHECKLIST.md)** - Project implementation checklist
+

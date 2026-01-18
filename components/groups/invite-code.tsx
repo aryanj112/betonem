@@ -67,9 +67,9 @@ export function InviteCode({ code, groupName }: InviteCodeProps) {
   };
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-8 text-center space-y-4">
-      <h3 className="text-sm font-medium text-gray-700">Your invite code</h3>
-      <div className="bg-white rounded-lg p-6 shadow-sm">
+    <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg p-8 text-center space-y-4 border border-primary/20">
+      <h3 className="text-sm font-medium text-muted-foreground">Your invite code</h3>
+      <div className="bg-card/50 backdrop-blur rounded-lg p-6 shadow-sm border border-border">
         <p className="text-4xl font-bold text-primary tracking-widest font-mono">
           {code}
         </p>

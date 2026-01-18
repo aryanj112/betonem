@@ -1,16 +1,40 @@
+/**
+ * Profile Page - Styled with Pink Theme and Pixelated Font
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
-import { Header } from "@/components/layout/header";
-import { Avatar } from "@/components/common/avatar";
 import { LoadingSpinner } from "@/components/common/loading-spinner";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { LogOut, Users, Trophy, Target, TrendingUp } from "lucide-react";
 import { formatCoins } from "@/lib/utils/calculations";
+import styles from "@/styles/Profile.module.css";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.4,
+      ease: [0.25, 0.46, 0.45, 0.94],
+    },
+  },
+};
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -31,7 +55,7 @@ export default function ProfilePage() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      router.push("/login");
+      router.push("/signin");
       return;
     }
 
@@ -105,153 +129,156 @@ export default function ProfilePage() {
     setIsSigningOut(true);
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push("/login");
+    router.push("/signin");
   }
 
   if (isLoading) {
     return <LoadingSpinner />;
   }
 
-  return (
-    <div className="min-h-screen bg-background">
-      <Header user={profile} />
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
-      <div className="max-w-2xl mx-auto p-4 space-y-6">
+  return (
+    <div className={styles.page}>
+      <motion.div
+        className={styles.container}
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {/* Header */}
+        <motion.header className={styles.header} variants={cardVariants}>
+          <h1 className={styles.pageTitle}>
+            Pro<span className={styles.titleAccent}>file</span>
+          </h1>
+        </motion.header>
+
         {/* Profile Card */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex flex-col items-center text-center space-y-4">
-              <Avatar
-                src={profile?.avatar_url}
-                alt={profile?.display_name}
-                fallback={profile?.display_name}
-                size="xl"
+        <motion.div className={styles.profileCard} variants={cardVariants}>
+          <div className={styles.avatarContainer}>
+            {profile?.avatar_url ? (
+              <img
+                src={profile.avatar_url}
+                alt={profile.display_name}
+                className={styles.avatar}
               />
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">
-                  {profile?.display_name}
-                </h1>
-                <p className="text-muted-foreground">@{profile?.username}</p>
-                {profile?.venmo_username && (
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Venmo: {profile.venmo_username}
-                  </p>
-                )}
+            ) : (
+              <div className={styles.avatarFallback}>
+                {getInitials(profile?.display_name || "?")}
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            )}
+          </div>
+          <h2 className={styles.displayName}>{profile?.display_name}</h2>
+          <p className={styles.username}>@{profile?.username}</p>
+          {profile?.venmo_username && (
+            <p className={styles.venmo}>Venmo: {profile.venmo_username}</p>
+          )}
+        </motion.div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription className="flex items-center gap-2 text-xs">
-                <Users className="w-4 h-4" />
-                Groups
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-foreground">
-                {stats?.totalGroups || 0}
-              </p>
-            </CardContent>
-          </Card>
+        <div className={styles.statsGrid}>
+          <motion.div className={styles.statCard} variants={cardVariants}>
+            <div className={styles.statIcon}>
+              <Users />
+            </div>
+            <div className={styles.statContent}>
+              <span className={styles.statLabel}>Groups</span>
+              <span className={styles.statValue}>{stats?.totalGroups || 0}</span>
+            </div>
+          </motion.div>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription className="flex items-center gap-2 text-xs">
-                <Trophy className="w-4 h-4" />
-                Total Balance
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-foreground">
+          <motion.div className={styles.statCard} variants={cardVariants}>
+            <div className={styles.statIcon}>
+              <Trophy />
+            </div>
+            <div className={styles.statContent}>
+              <span className={styles.statLabel}>Balance</span>
+              <span className={styles.statValue}>
                 {formatCoins(stats?.totalBalance || 0)}
-              </p>
-            </CardContent>
-          </Card>
+              </span>
+            </div>
+          </motion.div>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription className="flex items-center gap-2 text-xs">
-                <Target className="w-4 h-4" />
-                Total Bets
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-foreground">
-                {stats?.totalBets || 0}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {stats?.wonBets || 0} wins
-              </p>
-            </CardContent>
-          </Card>
+          <motion.div className={styles.statCard} variants={cardVariants}>
+            <div className={styles.statIcon}>
+              <Target />
+            </div>
+            <div className={styles.statContent}>
+              <span className={styles.statLabel}>Total Bets</span>
+              <span className={styles.statValue}>{stats?.totalBets || 0}</span>
+              <span className={styles.statSub}>{stats?.wonBets || 0} wins</span>
+            </div>
+          </motion.div>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription className="flex items-center gap-2 text-xs">
-                <TrendingUp className="w-4 h-4" />
-                Win Rate
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-foreground">
+          <motion.div className={styles.statCard} variants={cardVariants}>
+            <div className={styles.statIcon}>
+              <TrendingUp />
+            </div>
+            <div className={styles.statContent}>
+              <span className={styles.statLabel}>Win Rate</span>
+              <span className={styles.statValue}>
                 {(stats?.winRate || 0).toFixed(1)}%
-              </p>
-            </CardContent>
-          </Card>
+              </span>
+            </div>
+          </motion.div>
         </div>
 
         {/* Lifetime Stats */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Lifetime Stats</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex items-center justify-between py-2 border-b border-border">
-              <span className="text-muted-foreground">Total Wagered</span>
-              <span className="font-semibold text-foreground">
+        <motion.div className={styles.lifetimeCard} variants={cardVariants}>
+          <h3 className={styles.sectionTitle}>
+            Life<span className={styles.titleAccent}>time</span> Stats
+          </h3>
+          <div className={styles.lifetimeStats}>
+            <div className={styles.lifetimeRow}>
+              <span className={styles.lifetimeLabel}>Total Wagered</span>
+              <span className={styles.lifetimeValue}>
                 {formatCoins(stats?.totalWagered || 0)}
               </span>
             </div>
-            <div className="flex items-center justify-between py-2">
-              <span className="text-muted-foreground">Total Profit/Loss</span>
-              <span className={`font-semibold ${(stats?.totalProfit || 0) >= 0 ? "text-green-600" : "text-red-600"}`}>
+            <div className={styles.lifetimeRow}>
+              <span className={styles.lifetimeLabel}>Total Profit/Loss</span>
+              <span
+                className={`${styles.lifetimeValue} ${
+                  (stats?.totalProfit || 0) >= 0
+                    ? styles.profit
+                    : styles.loss
+                }`}
+              >
                 {(stats?.totalProfit || 0) >= 0 ? "+" : ""}
                 {formatCoins(stats?.totalProfit || 0)}
               </span>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </motion.div>
 
-        {/* Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Account</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex items-center justify-between py-2 border-b border-border">
-              <span className="text-muted-foreground">Email</span>
-              <span className="text-sm text-foreground">
-                {profile?.phone_number}
-              </span>
+        {/* Account Section */}
+        <motion.div className={styles.accountCard} variants={cardVariants}>
+          <h3 className={styles.sectionTitle}>
+            Acc<span className={styles.titleAccent}>ount</span>
+          </h3>
+          <div className={styles.accountInfo}>
+            <div className={styles.accountRow}>
+              <span className={styles.accountLabel}>Phone</span>
+              <span className={styles.accountValue}>{profile?.phone_number}</span>
             </div>
-            
-            <Button
-              variant="destructive"
-              className="w-full"
-              onClick={handleSignOut}
-              disabled={isSigningOut}
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              {isSigningOut ? "Signing out..." : "Sign Out"}
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+          <button
+            className={styles.signOutButton}
+            onClick={handleSignOut}
+            disabled={isSigningOut}
+          >
+            <LogOut />
+            {isSigningOut ? "Signing out..." : "Sign Out"}
+          </button>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
-

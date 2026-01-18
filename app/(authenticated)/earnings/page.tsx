@@ -1,316 +1,146 @@
-"use client";
+/**
+ * Earnings Page
+ * Dashboard for tracking settled bets and winnings/losses
+ */
 
-import { use, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { Header } from "@/components/layout/header";
+import { Suspense } from "react";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { EarningsHeader } from "@/components/earnings/EarningsHeader";
+import { SettlementsList } from "@/components/earnings/SettlementsList";
+import { Settlement } from "@/components/earnings/SettlementCard";
 import { LoadingSpinner } from "@/components/common/loading-spinner";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { formatCoins } from "@/lib/utils/calculations";
-import { formatDateTime } from "@/lib/utils/formatting";
-import { TrendingUp, TrendingDown, Trophy, Award, Target } from "lucide-react";
-import Link from "next/link";
-import { SettlementInfo } from "@/components/groups/settlement-info";
+import { EarningsPageWrapper } from "@/components/earnings/EarningsPageWrapper";
+import { connection } from "next/server";
+import styles from "@/styles/Earnings.module.css";
 
-export default function EarningsPage() {
-  const router = useRouter();
-  const [profile, setProfile] = useState<any>(null);
-  const [stats, setStats] = useState<any>(null);
-  const [recentBets, setRecentBets] = useState<any[]>([]);
-  const [groupsData, setGroupsData] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+async function SettlementsContent() {
+  await connection();
+  
+  const supabase = await createClient();
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  async function loadData() {
-    const supabase = createClient();
+  if (!user) {
+    redirect("/signin");
+  }
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+  // Get user's profile for Venmo info
+  const { data: profile } = await supabase
+    .from("users")
+    .select("venmo_username")
+    .eq("id", user.id)
+    .single();
 
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-
-    // Get profile
-    const { data: userProfile } = await supabase
-      .from("users")
-      .select("*")
-      .eq("id", user.id)
-      .single();
-
-    setProfile(userProfile);
-
-    // Get all groups user is in with member details
-    const { data: memberships } = await supabase
-      .from("group_members")
-      .select(`
-        group_id, 
-        balance,
+  // Get all user's bets with resolved/cancelled markets
+  const { data: userBets } = await supabase
+    .from("bets")
+    .select(`
+      *,
+      markets!inner (
+        id,
+        title,
+        status,
+        outcome,
+        yes_pool,
+        no_pool,
+        resolved_at,
+        group_id,
         groups (
           id,
           name
         )
-      `)
-      .eq("user_id", user.id);
+      )
+    `)
+    .eq("user_id", user.id)
+    .in("markets.status", ["resolved", "cancelled"])
+    .order("markets.resolved_at", { ascending: false })
+    .limit(50);
 
-    const groupIds = memberships?.map((m) => m.group_id) || [];
-    const totalBalance = memberships?.reduce((sum, m) => sum + m.balance, 0) || 0;
-
-    // For each group, get all members for settlement info
-    const groupsWithMembers = await Promise.all(
-      (memberships || []).map(async (membership: any) => {
-        const { data: members } = await supabase
-          .from("group_members")
-          .select(`
-            balance,
-            users (
-              id,
-              username,
-              display_name,
-              avatar_url,
-              venmo_username
-            )
-          `)
-          .eq("group_id", membership.group_id)
-          .order("balance", { ascending: false });
-
-        return {
-          groupId: membership.group_id,
-          groupName: membership.groups.name,
-          userBalance: membership.balance,
-          members: members?.map((m: any) => ({
-            id: m.users.id,
-            username: m.users.username,
-            display_name: m.users.display_name,
-            avatar_url: m.users.avatar_url,
-            venmo_username: m.users.venmo_username,
-            balance: m.balance,
-          })) || [],
-        };
-      })
-    );
-
-    setGroupsData(groupsWithMembers);
-
-    // Get all resolved bets
-    const { data: resolvedBetsData } = await supabase
-      .from("bets")
-      .select(`
-        *,
-        markets!inner (
-          id,
-          title,
-          group_id,
-          status,
-          outcome,
-          yes_pool,
-          no_pool,
-          resolved_at
-        )
-      `)
-      .eq("user_id", user.id)
-      .in("markets.group_id", groupIds)
-      .eq("markets.status", "resolved")
-      .order("markets.resolved_at", { ascending: false })
-      .limit(20);
-
-    const betsWithPayout = resolvedBetsData?.map((bet: any) => {
-      const market = bet.markets;
-      const totalPool = market.yes_pool + market.no_pool;
-      const winningPool = market.outcome ? market.yes_pool : market.no_pool;
-      const won = bet.position === market.outcome;
-      const payout = won && winningPool > 0
-        ? Math.floor((bet.amount / winningPool) * totalPool)
-        : 0;
-      const profit = won ? payout - bet.amount : -bet.amount;
-
-      return {
-        ...bet,
-        market,
-        won,
-        payout,
-        profit,
-      };
-    }) || [];
-
-    // Calculate stats
-    const totalBets = betsWithPayout.length;
-    const wonBets = betsWithPayout.filter((b) => b.won).length;
-    const totalWagered = betsWithPayout.reduce((sum, b) => sum + b.amount, 0);
-    const totalProfit = betsWithPayout.reduce((sum, b) => sum + b.profit, 0);
-    const winRate = totalBets > 0 ? (wonBets / totalBets) * 100 : 0;
-
-    setStats({
-      totalBalance,
-      totalBets,
-      wonBets,
-      totalWagered,
-      totalProfit,
-      winRate,
-    });
-
-    setRecentBets(betsWithPayout);
-    setIsLoading(false);
+  if (!userBets || userBets.length === 0) {
+    return { settlements: [], isEmpty: true };
   }
 
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
+  // Transform bets into settlements
+  const settlements: Settlement[] = userBets.map((bet: any) => {
+    const market = bet.markets;
+    const totalPool = market.yes_pool + market.no_pool;
+    const userPosition = bet.position; // true = YES, false = NO
+    
+    let result: "WON" | "LOST" | "PUSH";
+    let amount = 0;
 
-  return (
-    <div className="min-h-screen bg-background">
-      <Header user={profile} />
+    if (market.status === "cancelled") {
+      // Cancelled market - refund (push)
+      result = "PUSH";
+      amount = 0;
+    } else if (market.outcome === null) {
+      // Resolved but no outcome (shouldn't happen but handle it)
+      result = "PUSH";
+      amount = 0;
+    } else {
+      // Check if user won
+      const userWon = userPosition === market.outcome;
+      
+      if (userWon) {
+        // Calculate winnings
+        const winningPool = market.outcome ? market.yes_pool : market.no_pool;
+        if (winningPool > 0) {
+          const payout = Math.floor((bet.amount / winningPool) * totalPool);
+          const profit = payout - bet.amount;
+          result = "WON";
+          amount = profit;
+        } else {
+          result = "PUSH";
+          amount = 0;
+        }
+      } else {
+        // User lost
+        result = "LOST";
+        amount = -bet.amount;
+      }
+    }
 
-      <div className="max-w-4xl mx-auto p-4 space-y-6">
-        <h1 className="text-3xl font-bold text-foreground">Your Earnings</h1>
+    // Determine payout method
+    const payoutMethod = profile?.venmo_username ? "VENMO" : "PAYPAL";
+    
+    // For now, all resolved bets are marked as SENT
+    // In a real system, you'd track actual payout status separately
+    const payoutStatus = "SENT";
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription className="flex items-center gap-2">
-                <Trophy className="w-4 h-4" />
-                Total Balance
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-foreground">
-                {formatCoins(stats?.totalBalance || 0)}
-              </p>
-            </CardContent>
-          </Card>
+    return {
+      id: bet.id,
+      groupName: market.groups?.name || "Unknown Group",
+      groupTag: undefined, // Not storing tags in current schema
+      betTitle: market.title,
+      result,
+      amount,
+      settledAt: market.resolved_at || new Date().toISOString(),
+      payoutStatus,
+      payoutMethod,
+      marketId: market.id,
+      groupId: market.group_id,
+    };
+  });
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription className="flex items-center gap-2">
-                <Target className="w-4 h-4" />
-                Total Bets
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-foreground">
-                {stats?.totalBets || 0}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription className="flex items-center gap-2">
-                <Award className="w-4 h-4" />
-                Win Rate
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-foreground">
-                {stats?.winRate.toFixed(1)}%
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {stats?.wonBets}/{stats?.totalBets} wins
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="col-span-2 md:col-span-3">
-            <CardHeader className="pb-2">
-              <CardDescription>Total Profit/Loss</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className={`text-3xl font-bold ${(stats?.totalProfit || 0) >= 0 ? "text-green-400" : "text-red-400"}`}>
-                {(stats?.totalProfit || 0) >= 0 ? "+" : ""}
-                {formatCoins(stats?.totalProfit || 0)}
-              </p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Total wagered: {formatCoins(stats?.totalWagered || 0)}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Settlement Info by Group */}
-        {groupsData.length > 0 && (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold text-foreground">Settlement Info</h2>
-            <p className="text-sm text-muted-foreground">
-              See who you need to pay or who owes you in each group
-            </p>
-            {groupsData.map((group) => (
-              <SettlementInfo
-                key={group.groupId}
-                members={group.members}
-                groupName={group.groupName}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* Recent Bets */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Resolved Bets</CardTitle>
-            <CardDescription>
-              Your last 20 resolved bets across all groups
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {recentBets.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">
-                No resolved bets yet. Start betting to see your history!
-              </p>
-            ) : (
-              recentBets.map((bet) => (
-                <Link
-                  key={bet.id}
-                  href={`/groups/${bet.market.group_id}/bets/${bet.market.id}`}
-                  className="block"
-                >
-                  <div className="flex items-start justify-between p-4 rounded-lg border border-border hover:border-primary transition-colors">
-                    <div className="flex-1">
-                      <h3 className="font-medium text-foreground mb-1">
-                        {bet.market.title}
-                      </h3>
-                      <div className="flex items-center gap-2 mb-2">
-                        <Badge variant={bet.position ? "default" : "secondary"}>
-                          {bet.position ? "YES" : "NO"}
-                        </Badge>
-                        <span className="text-sm text-muted-foreground">
-                          {formatCoins(bet.amount)} wagered
-                        </span>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        Resolved {formatDateTime(bet.market.resolved_at)}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      {bet.won ? (
-                        <div className="flex items-center gap-1 text-green-400">
-                          <TrendingUp className="w-4 h-4" />
-                          <span className="font-bold">+{formatCoins(bet.profit)}</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-1 text-red-400">
-                          <TrendingDown className="w-4 h-4" />
-                          <span className="font-bold">{formatCoins(bet.profit)}</span>
-                        </div>
-                      )}
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {bet.won ? "Won" : "Lost"}
-                      </p>
-                    </div>
-                  </div>
-                </Link>
-              ))
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
+  return { settlements, isEmpty: false };
 }
 
+async function SettlementsWrapper() {
+  const { settlements, isEmpty } = await SettlementsContent();
+  
+  return <SettlementsList settlements={settlements} isEmpty={isEmpty} />;
+}
+
+export default function EarningsPage() {
+  return (
+    <EarningsPageWrapper>
+      <EarningsHeader />
+      <Suspense fallback={<LoadingSpinner />}>
+        <SettlementsWrapper />
+      </Suspense>
+    </EarningsPageWrapper>
+  );
+}

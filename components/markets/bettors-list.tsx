@@ -18,7 +18,7 @@ interface BettorsListProps {
 export function BettorsList({ bettors, currentUserId }: BettorsListProps) {
   if (bettors.length === 0) {
     return (
-      <p className="text-sm text-gray-500 text-center py-4">
+      <p className="text-sm text-muted-foreground text-center py-4">
         No bets placed yet
       </p>
     );
@@ -29,7 +29,7 @@ export function BettorsList({ bettors, currentUserId }: BettorsListProps) {
       {bettors.map((bettor) => (
         <div
           key={bettor.user_id}
-          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+          className="flex items-center justify-between p-3 bg-card rounded-lg border border-border"
         >
           <div className="flex items-center gap-3">
             <Avatar
@@ -39,10 +39,10 @@ export function BettorsList({ bettors, currentUserId }: BettorsListProps) {
               size="sm"
             />
             <div>
-              <p className="font-medium text-sm text-gray-900">
+              <p className="font-medium text-sm text-foreground">
                 {bettor.display_name}
                 {bettor.user_id === currentUserId && (
-                  <span className="text-xs text-gray-500 ml-1">(You)</span>
+                  <span className="text-xs text-muted-foreground ml-1">(You)</span>
                 )}
               </p>
             </div>

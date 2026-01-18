@@ -39,15 +39,33 @@ function BottomNavContent() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-col items-center justify-center flex-1 h-full touch-target",
-                "transition-colors",
+                "flex flex-col items-center justify-center flex-1 h-full touch-target relative",
+                "transition-all duration-200",
                 isActive
-                  ? "text-primary"
+                  ? "text-[#ff6c9f]"
                   : "text-gray-500 hover:text-gray-300"
               )}
             >
-              <Icon className={cn("w-6 h-6 mb-1")} />
-              <span className="text-xs font-medium">{item.label}</span>
+              {/* Active indicator bar at top */}
+              {isActive && (
+                <div 
+                  className="absolute top-0 left-1/2 -translate-x-1/2 h-1 bg-gradient-to-r from-[#ff6c9f] to-[#ff3d7a] rounded-b-full transition-all duration-200"
+                  style={{ width: '60%' }}
+                />
+              )}
+              
+              <Icon 
+                className={cn(
+                  "w-6 h-6 mb-1 transition-all duration-200",
+                  isActive && "drop-shadow-[0_0_8px_rgba(255,108,159,0.6)]"
+                )} 
+              />
+              <span className={cn(
+                "text-xs font-medium transition-all duration-200",
+                isActive && "font-semibold"
+              )}>
+                {item.label}
+              </span>
             </Link>
           );
         })}

@@ -44,7 +44,7 @@ export default function GroupSettingsPage({ params }: GroupSettingsPageProps) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      router.push("/login");
+      router.push("/signin");
       return;
     }
 
@@ -348,9 +348,9 @@ export default function GroupSettingsPage({ params }: GroupSettingsPageProps) {
         </Card>
 
         {/* Danger Zone */}
-        <Card className="border-red-500/50">
+        <Card className="border-pink-500/50">
           <CardHeader>
-            <CardTitle className="text-red-400">Danger Zone</CardTitle>
+            <CardTitle className="text-pink-400">Danger Zone</CardTitle>
             <CardDescription>
               Irreversible actions that affect your group
             </CardDescription>

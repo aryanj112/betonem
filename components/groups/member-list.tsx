@@ -20,7 +20,7 @@ export function MemberList({ members, currentUserId }: MemberListProps) {
       {members.map((member) => (
         <div
           key={member.id}
-          className="flex items-center justify-between p-3 bg-white rounded-lg border"
+          className="flex items-center justify-between p-3 bg-card rounded-lg border border-border"
         >
           <div className="flex items-center gap-3">
             <Avatar
@@ -30,21 +30,21 @@ export function MemberList({ members, currentUserId }: MemberListProps) {
               size="md"
             />
             <div>
-              <p className="font-medium text-gray-900">
+              <p className="font-medium text-foreground">
                 {member.display_name}
                 {member.id === currentUserId && (
-                  <span className="text-xs text-gray-500 ml-2">(You)</span>
+                  <span className="text-xs text-muted-foreground ml-2">(You)</span>
                 )}
                 {member.is_creator && (
                   <span className="text-xs text-primary ml-2">• Creator</span>
                 )}
               </p>
-              <p className="text-sm text-gray-500">@{member.username}</p>
+              <p className="text-sm text-muted-foreground">@{member.username}</p>
             </div>
           </div>
           <div className="text-right">
-            <p className="font-semibold text-gray-900">{member.balance}</p>
-            <p className="text-xs text-gray-500">coins</p>
+            <p className="font-semibold text-foreground">{member.balance}</p>
+            <p className="text-xs text-muted-foreground">coins</p>
           </div>
         </div>
       ))}

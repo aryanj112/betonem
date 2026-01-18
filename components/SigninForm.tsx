@@ -62,9 +62,11 @@ export function SigninForm({ onSubmit }: SigninFormProps) {
       } else {
         // Default behavior - you can connect this to your auth system
         console.log("Sign in:", { email });
+        setError("No submit handler configured");
       }
     } catch (err: any) {
-      setError(err.message || "Failed to sign in");
+      console.error("Signin error:", err);
+      setError(err.message || "Invalid email or password");
     } finally {
       setIsLoading(false);
     }

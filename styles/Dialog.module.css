@@ -1,0 +1,418 @@
+/**
+ * Dialog Styles - Matching Home Page Theme
+ * Dark background with pink accents and pixelated font
+ */
+
+/* ============================================================
+   BACKDROP
+   ============================================================ */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 50;
+}
+
+/* ============================================================
+   DIALOG CONTAINER
+   ============================================================ */
+
+.dialogContainer {
+  position: fixed;
+  inset: 0;
+  z-index: 51;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.dialog {
+  background: rgba(10, 10, 30, 0.95);
+  border: 1px solid rgba(255, 108, 159, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 108, 159, 0.2);
+  max-width: 450px;
+  width: 100%;
+  padding: 2rem;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.title {
+  font-family: var(--font-arcade), monospace;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 400;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.titleAccent {
+  color: #ff6c9f;
+}
+
+.closeButton {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.closeButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+}
+
+.closeButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.closeButton svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ============================================================
+   CONTENT
+   ============================================================ */
+
+.description {
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   FORM
+   ============================================================ */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.02em;
+}
+
+.input {
+  width: 100%;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 2rem;
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #ff6c9f;
+  box-shadow: 0 0 20px rgba(255, 108, 159, 0.3);
+}
+
+.input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 0.3em;
+}
+
+.input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   MESSAGES
+   ============================================================ */
+
+.error {
+  padding: 0.875rem 1rem;
+  background: rgba(255, 80, 120, 0.15);
+  border: 1px solid rgba(255, 80, 120, 0.4);
+  border-radius: 8px;
+  color: #ff8fa3;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.success {
+  padding: 0.875rem 1rem;
+  background: rgba(0, 255, 150, 0.15);
+  border: 1px solid rgba(0, 255, 150, 0.4);
+  border-radius: 8px;
+  color: #00ff96;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* ============================================================
+   SUBMIT BUTTON
+   ============================================================ */
+
+.submitButton {
+  width: 100%;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #ff6c9f 0%, #ff3d7a 100%);
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: var(--font-lexend-deca), sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 16px rgba(255, 108, 159, 0.3);
+}
+
+.submitButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(255, 108, 159, 0.4);
+}
+
+.submitButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submitButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.submitButton svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ============================================================
+   GROUP LIST (for Create Bet Dialog)
+   ============================================================ */
+
+.groupList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.groupCard {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  width: 100%;
+}
+
+.groupCard:hover {
+  border-color: rgba(255, 108, 159, 0.5);
+  background: rgba(255, 108, 159, 0.1);
+  box-shadow: 0 4px 16px rgba(255, 108, 159, 0.2);
+}
+
+.groupIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 108, 159, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff6c9f;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.groupIcon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.groupImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.groupInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.groupName {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 0.25rem 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.groupHint {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+.divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0.5rem 0;
+}
+
+.secondaryButton {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: var(--font-lexend-deca), sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.secondaryButton:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.secondaryButton svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ============================================================
+   LOADING & EMPTY STATES
+   ============================================================ */
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #ff6c9f;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.emptyText {
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   MOBILE ADJUSTMENTS
+   ============================================================ */
+
+@media (max-width: 640px) {
+  .dialog {
+    padding: 1.5rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .input {
+    font-size: 1.5rem;
+    letter-spacing: 0.4em;
+  }
+
+  .submitButton {
+    padding: 0.875rem 1.5rem;
+  }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .dialogContainer,
+  .submitButton {
+    transition: none !important;
+  }
+}
+

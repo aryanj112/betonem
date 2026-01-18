@@ -16,7 +16,7 @@ async function JoinPageContent({ code }: { code: string }) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/login?redirect=/join/${code}`);
+    redirect(`/signin?redirect=/join/${code}`);
   }
 
   // Get user profile

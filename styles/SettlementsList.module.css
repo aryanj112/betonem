@@ -1,0 +1,26 @@
+/* Settlements List Component */
+
+.settlementsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .settlementsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .settlementsGrid {
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .settlementsGrid {
+    gap: 1rem;
+  }
+}
+

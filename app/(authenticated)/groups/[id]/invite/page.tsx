@@ -19,7 +19,7 @@ async function InvitePageContent({ groupId }: { groupId: string }) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login");
+    redirect("/signin");
   }
 
   // Get user profile

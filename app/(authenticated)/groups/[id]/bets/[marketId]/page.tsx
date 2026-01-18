@@ -84,7 +84,7 @@ export default function BetDetailPage({
     } = await supabase.auth.getUser();
 
     if (!currentUser) {
-      router.push("/login");
+      router.push("/signin");
       return;
     }
 

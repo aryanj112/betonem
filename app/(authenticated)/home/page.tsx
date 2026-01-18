@@ -1,15 +1,21 @@
+/**
+ * Home Page - Dashboard view of active bets
+ */
+
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { Header } from "@/components/layout/header";
-import { GroupCard } from "@/components/groups/group-card";
-import { EmptyGroupsState } from "@/components/common/empty-groups-state";
-import { LoadingSpinner } from "@/components/common/loading-spinner";
+import { HomeHeader } from "@/components/home/HomeHeader";
+import { BetsGrid } from "@/components/home/BetsGrid";
+import { GroupsList } from "@/components/home/GroupsList";
+import { CreateBetDialog } from "@/components/home/CreateBetDialog";
 import { CreateGroupDialog } from "@/components/groups/create-group-dialog";
-import { JoinGroupDialog } from "@/components/groups/join-group-dialog";
+import { JoinGroupDialog } from "@/components/groups/join-group-dialog-styled";
+import { LoadingSpinner } from "@/components/common/loading-spinner";
 import { connection } from "next/server";
+import styles from "@/styles/Home.module.css";
 
-async function GroupsList() {
+async function BetsContent() {
   await connection();
   
   const supabase = await createClient();
@@ -19,126 +25,166 @@ async function GroupsList() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login");
+    redirect("/signin");
   }
 
-  // Get user profile
-  const { data: profile } = await supabase
-    .from("users")
-    .select("*")
-    .eq("id", user.id)
-    .single();
-
-  if (!profile) {
-    redirect("/signup");
-  }
-
-  // Get user's groups with member data
-  const { data: groupMemberships } = await supabase
+  // Get all groups the user is a member of with balance
+  const { data: memberships } = await supabase
     .from("group_members")
     .select(`
+      group_id,
       balance,
       groups (
         id,
         name,
-        image_url,
-        invite_code,
-        created_by,
-        created_at
+        image_url
       )
     `)
-    .eq("user_id", user.id)
-    .order("joined_at", { ascending: false });
+    .eq("user_id", user.id);
 
-  // Get member counts for each group
-  const groupIds = groupMemberships?.map((gm: any) => gm.groups.id) || [];
-  const { data: memberCounts } = await supabase
-    .from("group_members")
-    .select("group_id")
-    .in("group_id", groupIds);
+  const groupIds = memberships?.map((m) => m.group_id) || [];
+  
+  // Transform into groups data
+  const groups = memberships?.map((m: any) => ({
+    id: m.groups.id,
+    name: m.groups.name,
+    image_url: m.groups.image_url,
+    balance: m.balance,
+  })) || [];
 
-  // Count members per group
-  const memberCountMap: Record<string, number> = {};
-  memberCounts?.forEach((mc: any) => {
-    memberCountMap[mc.group_id] = (memberCountMap[mc.group_id] || 0) + 1;
-  });
-
-  // Get active bets count for each group
-  const { data: activeBets } = await supabase
-    .from("markets")
-    .select("group_id")
-    .in("group_id", groupIds)
-    .in("status", ["open", "locked"]);
-
-  // Count active bets per group
-  const activeBetsMap: Record<string, number> = {};
-  activeBets?.forEach((bet: any) => {
-    activeBetsMap[bet.group_id] = (activeBetsMap[bet.group_id] || 0) + 1;
-  });
-
-  const groups = groupMemberships?.map((gm: any) => ({
-    ...gm.groups,
-    balance: gm.balance,
-    memberCount: memberCountMap[gm.groups.id] || 1,
-    activeBetsCount: activeBetsMap[gm.groups.id] || 0,
-  }));
-
-  if (!groups || groups.length === 0) {
-    return <EmptyGroupsState />;
+  if (groupIds.length === 0) {
+    // No groups, show empty state
+    return (
+      <>
+        <div style={{ marginBottom: '2rem' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#ffffff', marginBottom: '1.5rem' }}>
+            Your Groups
+          </h2>
+          <GroupsList groups={[]} />
+        </div>
+        <BetsGrid bets={[]} />
+      </>
+    );
   }
+
+  // Get all markets from user's groups with group information
+  const { data: markets } = await supabase
+    .from("markets")
+    .select(`
+      id,
+      title,
+      status,
+      yes_pool,
+      no_pool,
+      lock_time,
+      end_time,
+      created_at,
+      groups (
+        id,
+        name
+      )
+    `)
+    .in("group_id", groupIds)
+    .in("status", ["open", "locked", "resolved"])
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  // Get user's bets for these markets
+  const marketIds = markets?.map((m) => m.id) || [];
+  const { data: userBets } = await supabase
+    .from("bets")
+    .select("market_id, position, amount")
+    .eq("user_id", user.id)
+    .in("market_id", marketIds);
+
+  // Create a map of user bets for quick lookup
+  const userBetsMap = new Map(
+    userBets?.map((bet) => [bet.market_id, bet]) || []
+  );
+
+  // Transform markets into bet card format
+  const bets = markets?.map((market: any) => {
+    const totalPool = market.yes_pool + market.no_pool;
+    const yesPercent = totalPool > 0 ? Math.round((market.yes_pool / totalPool) * 100) : 50;
+    
+    const userBet = userBetsMap.get(market.id);
+    
+    // Calculate time remaining
+    let timeRemaining: string | undefined;
+    if (market.status === "open") {
+      const lockTime = new Date(market.lock_time);
+      const now = new Date();
+      const diffMs = lockTime.getTime() - now.getTime();
+      const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+      
+      if (diffDays > 0) {
+        timeRemaining = `${diffDays}d left`;
+      } else {
+        const diffHours = Math.ceil(diffMs / (1000 * 60 * 60));
+        if (diffHours > 0) {
+          timeRemaining = `${diffHours}h left`;
+        } else {
+          timeRemaining = "Closing soon";
+        }
+      }
+    }
+
+    // Map database status to display status
+    let displayStatus: "OPEN" | "SETTLING" | "SETTLED";
+    if (market.status === "open") {
+      displayStatus = "OPEN";
+    } else if (market.status === "locked") {
+      displayStatus = "SETTLING";
+    } else {
+      displayStatus = "SETTLED";
+    }
+
+    return {
+      id: market.id,
+      title: market.title,
+      poolAmount: totalPool,
+      status: displayStatus,
+      leanPercent: yesPercent,
+      leaningSide: "YES" as const,
+      groupName: market.groups?.name,
+      groupId: market.groups?.id,
+      timeRemaining,
+      userPosition: userBet?.position,
+      userAmount: userBet?.amount,
+    };
+  }) || [];
 
   return (
-    <div className="space-y-4 p-4">
-      <h2 className="text-lg font-semibold text-foreground">Your Groups</h2>
-      {groups.map((group: any) => (
-        <GroupCard
-          key={group.id}
-          id={group.id}
-          name={group.name}
-          imageUrl={group.image_url}
-          memberCount={group.memberCount}
-          balance={group.balance}
-          activeBetsCount={group.activeBetsCount}
-        />
-      ))}
-    </div>
+    <>
+      {/* Groups Section */}
+      <div style={{ marginBottom: '3rem' }}>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#ffffff', marginBottom: '1.5rem' }}>
+          Your Groups
+        </h2>
+        <GroupsList groups={groups} />
+      </div>
+
+      {/* Bets Section */}
+      <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#ffffff', marginBottom: '1.5rem' }}>
+        Active Bets
+      </h2>
+      <BetsGrid bets={bets} />
+    </>
   );
-}
-
-async function HeaderSection() {
-  await connection();
-  
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
-  const { data: profile } = await supabase
-    .from("users")
-    .select("display_name, avatar_url")
-    .eq("id", user.id)
-    .single();
-
-  return <Header user={profile} showCreateButton showJoinButton />;
 }
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen">
-      <Suspense fallback={<div className="h-16 bg-card border-b border-border" />}>
-        <HeaderSection />
-      </Suspense>
-      <Suspense fallback={<LoadingSpinner />}>
-        <GroupsList />
-      </Suspense>
+    <main className={styles.homePage}>
+      <div className={styles.container}>
+        <HomeHeader />
+        <Suspense fallback={<LoadingSpinner />}>
+          <BetsContent />
+        </Suspense>
+      </div>
+      <CreateBetDialog />
       <CreateGroupDialog />
       <JoinGroupDialog />
-    </div>
+    </main>
   );
 }
-

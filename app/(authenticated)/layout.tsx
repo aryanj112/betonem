@@ -20,7 +20,7 @@ async function AuthCheck() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login");
+    redirect("/signin");
   }
 
   // Check if user has completed profile

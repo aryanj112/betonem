@@ -38,16 +38,16 @@ export function GroupCard({
             )}
             
             <div className="flex-1">
-              <h3 className="font-semibold text-lg text-white mb-2">{name}</h3>
+              <h3 className="font-semibold text-lg text-foreground mb-2">{name}</h3>
               
-              <div className="space-y-1 text-sm text-gray-400">
+              <div className="space-y-1 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <Users className="w-4 h-4" />
                   <span>{memberCount} member{memberCount !== 1 ? "s" : ""}</span>
                 </div>
                 
                 {activeBetsCount > 0 && (
-                  <p className="text-gray-400">{activeBetsCount} active bet{activeBetsCount !== 1 ? "s" : ""}</p>
+                  <p className="text-muted-foreground">{activeBetsCount} active bet{activeBetsCount !== 1 ? "s" : ""}</p>
                 )}
               </div>
             </div>
@@ -55,7 +55,7 @@ export function GroupCard({
 
           <div className="text-right flex-shrink-0">
             <p className="text-2xl font-bold text-primary">{balance}</p>
-            <p className="text-xs text-gray-500">coins</p>
+            <p className="text-xs text-muted-foreground">coins</p>
           </div>
         </div>
       </Card>

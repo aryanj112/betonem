@@ -84,7 +84,7 @@ export default function CreateBetPage({
               {/* Title */}
               <div className="space-y-2">
                 <Label htmlFor="title">
-                  Question <span className="text-red-500">*</span>
+                  Question <span className="text-primary">*</span>
                 </Label>
                 <Input
                   id="title"

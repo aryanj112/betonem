@@ -47,6 +47,7 @@ export async function createUserProfile(data: {
     return { error: insertError.message };
   }
 
+  console.log("User profile created successfully:", data.username);
   return { success: true };
 }
 

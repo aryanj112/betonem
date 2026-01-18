@@ -1,0 +1,375 @@
+/**
+ * Profile Page Styles - Pink Theme with Pixelated Font
+ */
+
+/* ============================================================
+   PAGE LAYOUT
+   ============================================================ */
+
+.page {
+  min-height: 100vh;
+  background: #000000;
+  font-family: var(--font-lexend-deca), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  padding: 2rem 1rem;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.pageTitle {
+  font-family: var(--font-arcade), monospace;
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 400;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.titleAccent {
+  color: #ff6c9f;
+}
+
+/* ============================================================
+   PROFILE CARD
+   ============================================================ */
+
+.profileCard {
+  background: rgba(10, 10, 30, 0.8);
+  border: 1px solid rgba(255, 108, 159, 0.3);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 108, 159, 0.1);
+}
+
+.avatarContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid #ff6c9f;
+  object-fit: cover;
+  box-shadow: 0 0 20px rgba(255, 108, 159, 0.4);
+}
+
+.avatarFallback {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff6c9f 0%, #ff3d7a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  border: 3px solid #ff6c9f;
+  box-shadow: 0 0 20px rgba(255, 108, 159, 0.4);
+}
+
+.displayName {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 0.5rem 0;
+}
+
+.username {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 0.5rem 0;
+}
+
+.venmo {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+/* ============================================================
+   STATS GRID
+   ============================================================ */
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.statCard {
+  background: rgba(10, 10, 30, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.statCard:hover {
+  border-color: rgba(255, 108, 159, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 108, 159, 0.15);
+}
+
+.statIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background: rgba(255, 108, 159, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff6c9f;
+  flex-shrink: 0;
+}
+
+.statIcon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.statContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.statSub {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ============================================================
+   LIFETIME STATS
+   ============================================================ */
+
+.lifetimeCard {
+  background: rgba(10, 10, 30, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.sectionTitle {
+  font-family: var(--font-arcade), monospace;
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: #ffffff;
+  margin: 0 0 1.5rem 0;
+}
+
+.lifetimeStats {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.lifetimeRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.lifetimeRow:last-child {
+  border-bottom: none;
+}
+
+.lifetimeLabel {
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+
+.lifetimeValue {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.profit {
+  color: #00ff96 !important;
+}
+
+.loss {
+  color: #ff5078 !important;
+}
+
+/* ============================================================
+   ACCOUNT SECTION
+   ============================================================ */
+
+.accountCard {
+  background: rgba(10, 10, 30, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.accountInfo {
+  margin-bottom: 1.5rem;
+}
+
+.accountRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.accountLabel {
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+
+.accountValue {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* ============================================================
+   SIGN OUT BUTTON
+   ============================================================ */
+
+.signOutButton {
+  width: 100%;
+  padding: 1rem 2rem;
+  background: transparent;
+  border: 2px solid rgba(255, 80, 120, 0.5);
+  border-radius: 8px;
+  color: #ff5078;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: var(--font-lexend-deca), sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.signOutButton:hover:not(:disabled) {
+  background: rgba(255, 80, 120, 0.1);
+  border-color: rgba(255, 80, 120, 0.8);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(255, 80, 120, 0.2);
+}
+
+.signOutButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.signOutButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.signOutButton svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ============================================================
+   MOBILE ADJUSTMENTS
+   ============================================================ */
+
+@media (max-width: 640px) {
+  .page {
+    padding: 1rem 0.75rem;
+  }
+
+  .statsGrid {
+    gap: 1rem;
+  }
+
+  .statCard {
+    padding: 1rem;
+  }
+
+  .statIcon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .statIcon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .statValue {
+    font-size: 1.25rem;
+  }
+
+  .avatar,
+  .avatarFallback {
+    width: 100px;
+    height: 100px;
+  }
+
+  .avatarFallback {
+    font-size: 2rem;
+  }
+
+  .displayName {
+    font-size: 1.5rem;
+  }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .statCard,
+  .signOutButton {
+    transition: none !important;
+  }
+}
+

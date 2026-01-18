@@ -58,7 +58,7 @@ export function Hero() {
           Get Started
           <ArrowRight className={styles.buttonIcon} />
         </Link>
-        <Link href="/login" className={styles.secondaryButton}>
+        <Link href="/signin" className={styles.secondaryButton}>
           Sign In
         </Link>
       </motion.div>

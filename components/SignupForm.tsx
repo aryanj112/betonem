@@ -68,8 +68,10 @@ export function SignupForm({ onSubmit }: SignupFormProps) {
       } else {
         // Default behavior - you can connect this to your auth system
         console.log("Sign up:", { email, password });
+        setError("No submit handler configured");
       }
     } catch (err: any) {
+      console.error("Signup error:", err);
       setError(err.message || "Failed to create account");
     } finally {
       setIsLoading(false);
@@ -151,7 +153,7 @@ export function SignupForm({ onSubmit }: SignupFormProps) {
 
       <motion.p className={styles.loginLink} variants={itemVariants}>
         Already have an account?{" "}
-        <Link href="/login" className={styles.link}>
+        <Link href="/signin" className={styles.link}>
           Log in
         </Link>
       </motion.p>
