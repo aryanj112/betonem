@@ -130,15 +130,74 @@ Example:
 ## Deployment
 
 ### Deploy to Vercel
-1. Push your code to GitHub
-2. Import to Vercel
-3. Add environment variables in Vercel dashboard
-4. Update `NEXT_PUBLIC_APP_URL` to your production domain
 
-### Update Supabase
+1. **Push your code to GitHub**
+   ```bash
+   git add .
+   git commit -m "Ready for deployment"
+   git push origin main
+   ```
+
+2. **Import to Vercel**
+   - Go to [vercel.com](https://vercel.com)
+   - Click "Import Project"
+   - Select your GitHub repository
+   - Click "Import"
+
+3. **Add Environment Variables**
+   - In Vercel Dashboard, go to **Settings** → **Environment Variables**
+   - Add these variables for **Production**, **Preview**, and **Development**:
+     - `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL
+     - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase anon key
+   - Click "Save"
+
+4. **Deploy**
+   - Go to **Deployments** tab
+   - Click "Redeploy" to rebuild with environment variables
+   - Wait for deployment to complete (~2-3 minutes)
+
+### Update Supabase for Production
+
 1. Go to **Authentication** → **URL Configuration**
-2. Set **Site URL** to your production domain
-3. Add domain to **Redirect URLs**
+2. Set **Site URL** to your production domain (e.g., `https://your-app.vercel.app`)
+3. Add domain to **Redirect URLs** list
+4. Add these to **Redirect URLs**:
+   - `https://your-app.vercel.app/auth/callback`
+   - `https://your-app.vercel.app/auth/confirm`
+
+### Common Production Issues
+
+#### Issue: Works locally but not on Vercel
+**Possible causes:**
+
+1. **Missing Environment Variables** (Most common!)
+   - Make sure both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are set in Vercel
+   - Verify they're set for all environments (Production, Preview, Development)
+   - Redeploy after adding variables
+
+2. **Package Version Mismatches**
+   - We've locked versions in `package.json` to prevent this
+   - If you see "Module not found" errors, check your `package.json` dependencies
+
+3. **Incorrect Environment Variable Names**
+   - Must be exactly: `NEXT_PUBLIC_SUPABASE_ANON_KEY` (not `PUBLISHABLE_KEY`)
+   - Check Vercel dashboard for typos
+
+4. **Supabase URL Configuration**
+   - Verify Site URL in Supabase matches your Vercel domain
+   - Add all redirect URLs for auth callbacks
+
+#### Issue: "Failed to fetch" or authentication errors
+- Check Supabase → Authentication → URL Configuration
+- Ensure Site URL and Redirect URLs include your production domain
+- Check browser console for CORS errors
+
+#### Issue: Build succeeds but runtime errors
+- Check Vercel deployment logs: Click deployment → "View Function Logs"
+- Common causes:
+  - Missing environment variables (check Settings → Environment Variables)
+  - Database connection issues (verify Supabase project is active)
+  - RLS policy errors (see Troubleshooting section below)
 
 ## Troubleshooting
 
