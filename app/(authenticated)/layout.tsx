@@ -1,16 +1,12 @@
 import { Suspense } from "react";
-import dynamicImport from "next/dynamic";
 import { unstable_noStore } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Toaster } from "@/components/ui/toaster";
 import { LoadingSpinner } from "@/components/common/loading-spinner";
+import { BottomNav } from "@/components/layout/bottom-nav";
 import { connection } from "next/server";
 
-const BottomNav = dynamicImport(
-  () => import("@/components/layout/bottom-nav").then((mod) => ({ default: mod.BottomNav })),
-  { ssr: false }
-);
 
 async function AuthCheck() {
   // Tell Next.js this component needs dynamic data
@@ -41,8 +37,6 @@ async function AuthCheck() {
   return null;
 }
 
-// Mark this layout as dynamic to prevent prerendering issues
-export const dynamic = 'force-dynamic';
 
 export default function AuthenticatedLayout({
   children,
@@ -62,4 +56,3 @@ export default function AuthenticatedLayout({
     </div>
   );
 }
-

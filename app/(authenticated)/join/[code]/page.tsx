@@ -8,7 +8,7 @@ import { connection } from "next/server";
 
 async function JoinPageContent({ code }: { code: string }) {
   await connection();
-  
+
   const supabase = await createClient();
 
   const {
@@ -56,7 +56,7 @@ async function JoinPageContent({ code }: { code: string }) {
             </p>
           </div>
         )}
-        
+
         <JoinGroupDialog defaultCode={code.toUpperCase()} />
       </div>
     </>

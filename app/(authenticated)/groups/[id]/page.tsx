@@ -17,7 +17,7 @@ import { ResolvedBetsList } from "@/components/groups/resolved-bets-list";
 async function GroupContent({ groupId, userId }: { groupId: string; userId: string }) {
   unstable_noStore();
   await connection();
-  
+
   const supabase = await createClient();
 
   // Get group details
@@ -206,7 +206,7 @@ async function GroupContent({ groupId, userId }: { groupId: string; userId: stri
 async function GroupHeader({ groupId, userId }: { groupId: string; userId: string }) {
   unstable_noStore();
   await connection();
-  
+
   const supabase = await createClient();
 
   const { data: profile } = await supabase
@@ -237,7 +237,7 @@ async function GroupHeader({ groupId, userId }: { groupId: string; userId: strin
 async function UserAuth({ groupId }: { groupId: string }) {
   unstable_noStore();
   await connection();
-  
+
   const supabase = await createClient();
 
   const {

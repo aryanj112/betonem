@@ -11,7 +11,7 @@ import { connection } from "next/server";
 
 async function InvitePageContent({ groupId }: { groupId: string }) {
   await connection();
-  
+
   const supabase = await createClient();
 
   const {
@@ -55,7 +55,7 @@ async function InvitePageContent({ groupId }: { groupId: string }) {
   return (
     <>
       <Header user={profile} />
-      
+
       <div className="max-w-2xl mx-auto p-6 space-y-6">
         <Button
           variant="ghost"
