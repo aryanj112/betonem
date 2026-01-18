@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  cacheComponents: true,
   eslint: {
     // Don't fail builds on ESLint errors in production
     ignoreDuringBuilds: true,
