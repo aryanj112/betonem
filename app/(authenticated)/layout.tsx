@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import dynamic from "next/dynamic";
+import dynamicImport from "next/dynamic";
 import { unstable_noStore } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -7,7 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { LoadingSpinner } from "@/components/common/loading-spinner";
 import { connection } from "next/server";
 
-const BottomNav = dynamic(
+const BottomNav = dynamicImport(
   () => import("@/components/layout/bottom-nav").then((mod) => ({ default: mod.BottomNav })),
   { ssr: false }
 );
@@ -16,7 +16,7 @@ async function AuthCheck() {
   // Tell Next.js this component needs dynamic data
   unstable_noStore();
   await connection();
-  
+
   const supabase = await createClient();
 
   const {
